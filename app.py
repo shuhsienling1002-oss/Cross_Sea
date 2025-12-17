@@ -11,8 +11,11 @@ def render_wolf_lesson(grade, topic_data, version_key):
     WOLF 引擎核心：動態生成對應五個不同素養的五階段教案。
     """
     
-    # 1. 取得該版本的特定資料
-    v_data = topic_data["versions"][version_key]
+    # 1. 取得該版本的特定資料 (這裡會用修正後的 Key 進行查找)
+    if version_key in topic_data["versions"]:
+        v_data = topic_data["versions"][version_key]
+    else:
+        return "⚠️ Error: 資料庫索引錯誤，請聯繫開發者。"
     
     # 2. 定義風格標題與教學模式
     if "Ver. A" in version_key:
@@ -36,7 +39,7 @@ def render_wolf_lesson(grade, topic_data, version_key):
         methodology = "WOLF x Design Thinking (設計思考)"
         role = "仿生設計師 (Designer)"
 
-    # 3. 組合 Markdown 文本 (嚴格遵循 WOLF 五階段 + 五素養)
+    # 3. 組合 Markdown 文本
     markdown_content = f"""
 # 【跨越黑潮】WOLF 教學模組設計：{topic_data['name']}
 
@@ -142,7 +145,7 @@ def render_wolf_lesson(grade, topic_data, version_key):
 # ==========================================
 # 2. 教案資料庫 (Topics Database)
 # ==========================================
-# 這裡針對每個版本，設定了「5個完全不同」的素養代碼
+# [FIX]: 這裡的 Key 必須跟 st.radio 的選項完全一致
 
 topics_db = {
     "國中九年級 (力與運動/力矩)": [
@@ -150,11 +153,10 @@ topics_db = {
             "name": "誰能活著渡過黑潮？",
             "concept": "力矩 (Torque) 與 向量分解",
             "versions": {
-                "Ver. A 標準探究版": {
+                "Ver. A 標準探究版 (Science)": {
                     "obj_cognitive": "能運用向量分解解釋風對帆的作用力。",
                     "obj_skill": "能操作控制變因實驗，比較不同帆型的受力差異。",
                     "obj_affective": "體會科學原理如何驗證傳統智慧。",
-                    # 五個階段對應五個不同素養
                     "phase1_comp": "社會 [Sc-IV-2] 探究人類生活與環境的互動關係。",
                     "phase2_comp": "自科 [tr-IV-1] 能將所習得的知識正確的連結到所觀察到的自然現象。",
                     "phase3_comp": "自科 [pe-IV-2] 能正確安全操作適合學習階段的物品、器材儀器、科技設備與資源。",
@@ -178,11 +180,10 @@ topics_db = {
                     "rubric_b": "能指出重心高低影響穩定度。",
                     "rubric_a": "能精確繪製向量分解圖並計算力矩，以此解釋蟹爪帆優勢。"
                 },
-                "Ver. B 硬派實作版": {
+                "Ver. B 硬派實作版 (Engineering)": {
                     "obj_cognitive": "理解結構重心對載具穩定性的影響。",
                     "obj_skill": "能利用簡易材料設計並製作抗風船模。",
                     "obj_affective": "培養『試誤』與『反脆弱』的工程師精神。",
-                    # 五個階段對應五個不同素養
                     "phase1_comp": "科技 [議t-IV-1] 了解科技與社會議題的關係。",
                     "phase2_comp": "科技 [a-IV-2] 針對日常問題，提出多元的解決方案。",
                     "phase3_comp": "科技 [Sb-V-3] 能運用探究與實作方式，設計並測試簡易裝置。",
@@ -206,11 +207,10 @@ topics_db = {
                     "rubric_b": "能透過嘗試錯誤修改模型，提升穩定性。",
                     "rubric_a": "能運用物理原理進行結構優化，成功渡過黑潮。"
                 },
-                "Ver. C 深度文化版": {
+                "Ver. C 深度文化版 (Culture)": {
                     "obj_cognitive": "認識南島語族的航海科技與價值觀。",
                     "obj_skill": "能製作具有文化象徵意義的模型。",
                     "obj_affective": "認同並尊重原住民族『順應自然』的生態智慧。",
-                    # 五個階段對應五個不同素養
                     "phase1_comp": "原民 [原-J-C3] 探索不同文化的內涵，尊重並欣賞差異。",
                     "phase2_comp": "社會 [2a-IV-1] 敏覺居住地方的社會、經濟、文化及環境的變遷。",
                     "phase3_comp": "原民 [原-J-B3] 藉由族語的學習，賞析文化中美學的傳達。",
@@ -234,11 +234,10 @@ topics_db = {
                     "rubric_b": "能說出蟹爪帆的文化故事與象徵意義。",
                     "rubric_a": "能深度比較西方與南島航海觀的哲學差異。"
                 },
-                "Ver. D 數學幾何版": {
+                "Ver. D 數學幾何版 (Math)": {
                     "obj_cognitive": "能計算不同幾何形狀的重心位置。",
                     "obj_skill": "能運用幾何作圖法找到不規則圖形的重心。",
                     "obj_affective": "欣賞數學在解決實際生存問題中的應用價值。",
-                    # 五個階段對應五個不同素養
                     "phase1_comp": "數學 [n-IV-9] 理解比與比例的應用。",
                     "phase2_comp": "數學 [s-IV-4] 理解幾何圖形的性質。",
                     "phase3_comp": "自科 [pa-IV-1] 能運用測量工具進行精確測量。",
@@ -262,11 +261,10 @@ topics_db = {
                     "rubric_b": "能透過實驗找到重心，並比較高低。",
                     "rubric_a": "能運用重心性質與力矩公式，以數學邏輯證明蟹爪帆的穩定性。"
                 },
-                "Ver. E 仿生美學版": {
+                "Ver. E 仿生美學版 (Art)": {
                     "obj_cognitive": "認識仿生學 (Biomimicry) 的概念與應用。",
                     "obj_skill": "能運用自然造型元素進行帆船外觀設計。",
                     "obj_affective": "體會機能美學 (Form follows function) 的深層意義。",
-                    # 五個階段對應五個不同素養
                     "phase1_comp": "藝術 [視1-IV-1] 能運用藝術詞彙與概念，描述藝術作品。",
                     "phase2_comp": "藝術 [視1-IV-2] 能表達對藝術作品的直觀感受與聯想。",
                     "phase3_comp": "科技 [設a-IV-1] 能運用設計思考，解決日常生活問題。",
@@ -352,7 +350,7 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.caption("Engine: **跨越黑潮 v14.0 (5-Phase/5-Comp)**")
+    st.caption("Engine: **跨越黑潮 v14.1 (Fix Key)**")
 
 # 主畫面
 st.markdown(f"# 🌊 跨越黑潮：{grade_select.split(' ')[0]} WOLF 教案")
